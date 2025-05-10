@@ -7,7 +7,7 @@ from app.routers.objects   import router as objects_router
 from app.routers.areas import router as areas_router
 from app.routers.roomgroups import router as roomgroups_router
 from app.routers.rooms import router as rooms_router
-
+from app.routers.positions import router as positions_router
 
 
 # Tabellen anlegen
@@ -32,6 +32,7 @@ app.include_router(objects_router)
 app.include_router(areas_router)
 app.include_router(roomgroups_router)
 app.include_router(rooms_router)
+app.include_router(positions_router)
 
 
 # Geschützter Beispiel-Endpoint
