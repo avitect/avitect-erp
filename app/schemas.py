@@ -49,6 +49,17 @@ class AreaCreate(AreaBase):
 class AreaRead(AreaBase):
     id: int
 
+# --- RoomGroup-Schemas ---
+class RoomGroupBase(BaseModel):
+    area_id: int
+    name: str
+
+class RoomGroupCreate(RoomGroupBase):
+    pass
+
+class RoomGroupRead(RoomGroupBase):
+    id: int
+
 # --- Room-Schemas ---
 class RoomBase(BaseModel):
     area_id: int
@@ -60,13 +71,13 @@ class RoomCreate(RoomBase):
 class RoomRead(RoomBase):
     id: int
 
-# --- RoomGroup-Schemas ---
-class RoomGroupBase(BaseModel):
-    area_id: int
+# --- Position-Schemas ---
+class PositionBase(BaseModel):
+    room_id: int
     name: str
 
-class RoomGroupCreate(RoomGroupBase):
+class PositionCreate(PositionBase):
     pass
 
-class RoomGroupRead(RoomGroupBase):
+class PositionRead(PositionBase):
     id: int
