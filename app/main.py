@@ -10,6 +10,9 @@ from app.routers.rooms import router as rooms_router
 from app.routers.positions import router as positions_router
 from app.routers.systems import router as systems_router
 from app.routers.devices import router as devices_router
+from app.routers.ports       import router as ports_router
+from app.routers.connections import router as connections_router
+
 
 # Tabellen anlegen
 metadata.create_all(bind=engine)
@@ -36,6 +39,9 @@ app.include_router(rooms_router)
 app.include_router(positions_router)
 app.include_router(systems_router)
 app.include_router(devices_router)
+app.include_router(ports_router)
+app.include_router(connections_router)
+
 
 # Geschützter Beispiel-Endpoint
 @app.get("/protected")
