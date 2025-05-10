@@ -59,3 +59,14 @@ class RoomCreate(RoomBase):
 
 class RoomRead(RoomBase):
     id: int
+
+# --- RoomGroup-Schemas ---
+class RoomGroupBase(BaseModel):
+    area_id: int
+    name: str
+
+class RoomGroupCreate(RoomGroupBase):
+    pass
+
+class RoomGroupRead(RoomGroupBase):
+    id: int
