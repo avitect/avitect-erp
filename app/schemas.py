@@ -48,3 +48,14 @@ class AreaCreate(AreaBase):
 
 class AreaRead(AreaBase):
     id: int
+
+# --- Room-Schemas ---
+class RoomBase(BaseModel):
+    area_id: int
+    name: str
+
+class RoomCreate(RoomBase):
+    pass
+
+class RoomRead(RoomBase):
+    id: int
