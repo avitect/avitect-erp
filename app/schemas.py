@@ -52,6 +52,7 @@ class ObjectRead(ObjectBase):
         orm_mode = True
 
 class ObjectUpdate(BaseModel):
+    customer_id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
 
@@ -69,6 +70,7 @@ class AreaRead(AreaBase):
         orm_mode = True
 
 class AreaUpdate(BaseModel):
+    object_id: Optional[int] = None
     name: Optional[str] = None
 
 # --- RoomGroup-Schemas ---
@@ -85,6 +87,7 @@ class RoomGroupRead(RoomGroupBase):
         orm_mode = True
 
 class RoomGroupUpdate(BaseModel):
+    area_id: Optional[int] = None
     name: Optional[str] = None
 
 # --- Room-Schemas ---
@@ -101,6 +104,7 @@ class RoomRead(RoomBase):
         orm_mode = True
 
 class RoomUpdate(BaseModel):
+    area_id: Optional[int] = None
     name: Optional[str] = None
 
 # --- Position-Schemas ---
@@ -117,7 +121,9 @@ class PositionRead(PositionBase):
         orm_mode = True
 
 class PositionUpdate(BaseModel):
+    room_id: Optional[int] = None
     name: Optional[str] = None
+
 
 # --- System-Schemas ---
 class SystemBase(BaseModel):
@@ -133,8 +139,9 @@ class SystemRead(SystemBase):
         orm_mode = True
 
 class SystemUpdate(BaseModel):
+    object_id: Optional[int] = None
     name: Optional[str] = None
-
+    
 # --- Device-Schemas ---
 class DeviceBase(BaseModel):
     system_id: int
@@ -155,6 +162,7 @@ class DeviceRead(DeviceBase):
         orm_mode = True
 
 class DeviceUpdate(BaseModel):
+    system_id: Optional[int] = None
     name: Optional[str] = None
     device_type: Optional[str] = None
     object_id: Optional[int] = None
@@ -181,11 +189,13 @@ class PortRead(PortBase):
         orm_mode = True
 
 class PortUpdate(BaseModel):
+    device_id: Optional[int] = None
     name: Optional[str] = None
     direction: Optional[Literal["input", "output"]] = None
     connectivity: Optional[Literal["wired", "wireless"]] = None
     connector_type: Optional[str] = None
     signal_type: Optional[str] = None
+
 
 # --- Connection-Schemas ---
 class ConnectionBase(BaseModel):
@@ -205,5 +215,9 @@ class ConnectionRead(ConnectionBase):
         orm_mode = True
 
 class ConnectionUpdate(BaseModel):
+    from_device_id: Optional[int] = None
+    from_port_id: Optional[int] = None
+    to_device_id: Optional[int] = None
+    to_port_id: Optional[int] = None
     cable_type: Optional[str] = None
     cable_length: Optional[float] = None
