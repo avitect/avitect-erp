@@ -1,37 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
+from fastapi import APIRouter, HTTPException, status
 from app.database import database
 from app.models import customers
-from app.schemas import CustomerCreate, CustomerRead
-from app.auth import get_current_user
+from app.schemas import CustomerCreate, CustomerRead, CustomerUpdate
 
-router = APIRouter(prefix="/customers", tags=["customers"])
+router = APIRouter(
+    prefix="/customers",
+    tags=["Customers"],
+)
 
-# Create
 @router.post("/", response_model=CustomerRead, status_code=status.HTTP_201_CREATED)
-async def create_customer(
-    data: CustomerCreate, user=Depends(get_current_user)
-):
-    query = customers.insert().values(**data.dict())
+async def create_customer(customer: CustomerCreate):
+    query = customers.insert().values(**customer.dict())
     customer_id = await database.execute(query)
-    return {**data.dict(), "id": customer_id}
+    return {**customer.dict(), "id": customer_id}
 
-# Read All
 @router.get("/", response_model=List[CustomerRead])
-async def list_customers(user=Depends(get_current_user)):
-    rows = await database.fetch_all(customers.select())
-    return rows
+async def read_customers():
+    query = customers.select()
+    return await database.fetch_all(query)
 
-# Read One
-@router.get("/{customer_id}", response_model=CustomerRead)
-async def get_customer(customer_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(customers.select().where(customers.c.id == customer_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return row
+@router.get("/{id}", response_model=CustomerRead)
+async def read_customer(id: int):
+    query = customers.select().where(customers.c.id == id)
+    customer = await database.fetch_one(query)
+    if not customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer nicht gefunden",
+        )
+    return customer
 
-# Delete
-@router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_customer(customer_id: int, user=Depends(get_current_user)):
-    await database.execute(customers.delete().where(customers.c.id == customer_id))
-    return
+@router.put("/{id}", response_model=CustomerRead)
+async def update_customer(id: int, customer: CustomerUpdate):
+    values = {k: v for k, v in customer.dict().items() if v is not None}
+    query = (
+        customers.update()
+        .where(customers.c.id == id)
+        .values(**values)
+        .returning(customers)
+    )
+    updated = await database.fetch_one(query)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer nicht gefunden",
+        )
+    return updated
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_customer(id: int):
+    query = customers.delete().where(customers.c.id == id)
+    result = await database.execute(query)
+    if result == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer nicht gefunden",
+        )
+    return None
