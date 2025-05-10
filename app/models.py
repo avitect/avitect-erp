@@ -22,3 +22,14 @@ customers = Table(
     Column("email", String, nullable=True),
     Column("phone", String, nullable=True),
 )
+
+from sqlalchemy import ForeignKey
+
+objects = Table(
+    "objects",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("customer_id", Integer, ForeignKey("customers.id"), nullable=False),
+    Column("name", String, nullable=False),
+    Column("description", String, nullable=True),
+)
