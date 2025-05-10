@@ -18,6 +18,10 @@ async def on_shutdown():
 
 # Auth-Router
 app.include_router(auth_router)
+from app.routers.customers import router as customers_router
+
+# ganz unten:
+app.include_router(customers_router)
 
 # Geschützter Beispiel-Endpoint
 @app.get("/protected")
