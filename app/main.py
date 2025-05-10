@@ -5,6 +5,8 @@ from app.models import users as users_table
 from app.routers.customers import router as customers_router
 from app.routers.objects   import router as objects_router
 from app.routers.areas import router as areas_router
+from app.routers.rooms import router as rooms_router
+
 
 
 # Tabellen anlegen
@@ -24,12 +26,10 @@ async def on_shutdown():
 app.include_router(auth_router)
 from app.routers.customers import router as customers_router
 
-# ganz unten:
 app.include_router(customers_router)
-
-# Neu: Objekt-Router
 app.include_router(objects_router)
 app.include_router(areas_router)
+app.include_router(rooms_router)
 
 
 # Geschützter Beispiel-Endpoint
