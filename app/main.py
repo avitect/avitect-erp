@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from sqlalchemy import Float
 from app.database import database, engine, metadata
 from app.auth import router as auth_router, get_current_user
 from app.models import users as users_table
