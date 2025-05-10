@@ -60,3 +60,11 @@ rooms = Table(
     Column("area_id", Integer, ForeignKey("areas.id"), nullable=False),
     Column("name", String, nullable=False),
 )
+
+positions = Table(
+    "positions",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("room_id", Integer, ForeignKey("rooms.id"), nullable=False),
+    Column("name", String, nullable=False),
+)
