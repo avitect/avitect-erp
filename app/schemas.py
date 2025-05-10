@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, Literal
 
 # --- User-Schemas ---
 class UserBase(BaseModel):
@@ -11,6 +11,12 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
 
 # --- Customer-Schemas ---
 class CustomerBase(BaseModel):
@@ -23,8 +29,13 @@ class CustomerCreate(CustomerBase):
 
 class CustomerRead(CustomerBase):
     id: int
+    class Config:
+        orm_mode = True
 
-from typing import Optional
+class CustomerUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
 
 # --- Object-Schemas ---
 class ObjectBase(BaseModel):
@@ -37,6 +48,12 @@ class ObjectCreate(ObjectBase):
 
 class ObjectRead(ObjectBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class ObjectUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 # --- Bereich-Schemas ---
 class AreaBase(BaseModel):
@@ -48,6 +65,11 @@ class AreaCreate(AreaBase):
 
 class AreaRead(AreaBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class AreaUpdate(BaseModel):
+    name: Optional[str] = None
 
 # --- RoomGroup-Schemas ---
 class RoomGroupBase(BaseModel):
@@ -59,6 +81,11 @@ class RoomGroupCreate(RoomGroupBase):
 
 class RoomGroupRead(RoomGroupBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class RoomGroupUpdate(BaseModel):
+    name: Optional[str] = None
 
 # --- Room-Schemas ---
 class RoomBase(BaseModel):
@@ -70,6 +97,11 @@ class RoomCreate(RoomBase):
 
 class RoomRead(RoomBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class RoomUpdate(BaseModel):
+    name: Optional[str] = None
 
 # --- Position-Schemas ---
 class PositionBase(BaseModel):
@@ -81,6 +113,11 @@ class PositionCreate(PositionBase):
 
 class PositionRead(PositionBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class PositionUpdate(BaseModel):
+    name: Optional[str] = None
 
 # --- System-Schemas ---
 class SystemBase(BaseModel):
@@ -92,6 +129,11 @@ class SystemCreate(SystemBase):
 
 class SystemRead(SystemBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class SystemUpdate(BaseModel):
+    name: Optional[str] = None
 
 # --- Device-Schemas ---
 class DeviceBase(BaseModel):
@@ -109,8 +151,17 @@ class DeviceCreate(DeviceBase):
 
 class DeviceRead(DeviceBase):
     id: int
+    class Config:
+        orm_mode = True
 
-from typing import Literal
+class DeviceUpdate(BaseModel):
+    name: Optional[str] = None
+    device_type: Optional[str] = None
+    object_id: Optional[int] = None
+    area_id: Optional[int] = None
+    roomgroup_id: Optional[int] = None
+    room_id: Optional[int] = None
+    position_id: Optional[int] = None
 
 # --- Port-Schemas ---
 class PortBase(BaseModel):
@@ -126,6 +177,15 @@ class PortCreate(PortBase):
 
 class PortRead(PortBase):
     id: int
+    class Config:
+        orm_mode = True
+
+class PortUpdate(BaseModel):
+    name: Optional[str] = None
+    direction: Optional[Literal["input", "output"]] = None
+    connectivity: Optional[Literal["wired", "wireless"]] = None
+    connector_type: Optional[str] = None
+    signal_type: Optional[str] = None
 
 # --- Connection-Schemas ---
 class ConnectionBase(BaseModel):
@@ -141,4 +201,9 @@ class ConnectionCreate(ConnectionBase):
 
 class ConnectionRead(ConnectionBase):
     id: int
+    class Config:
+        orm_mode = True
 
+class ConnectionUpdate(BaseModel):
+    cable_type: Optional[str] = None
+    cable_length: Optional[float] = None
