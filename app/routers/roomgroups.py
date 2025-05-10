@@ -1,29 +1,56 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
+from fastapi import APIRouter, HTTPException, status, Depends
 from app.database import database
-from app.models import room_groups
-from app.schemas import RoomGroupCreate, RoomGroupRead
+from app.models import positions, rooms
+from app.schemas import PositionCreate, PositionRead, PositionUpdate
 from app.auth import get_current_user
 
-router = APIRouter(prefix="/room_groups", tags=["room_groups"])
+router = APIRouter(
+    prefix="/positions",
+    tags=["Positions"],
+    dependencies=[Depends(get_current_user)]
+)
 
-@router.post("/", response_model=RoomGroupRead, status_code=status.HTTP_201_CREATED)
-async def create_roomgroup(data: RoomGroupCreate, user=Depends(get_current_user)):
-    rg_id = await database.execute(room_groups.insert().values(**data.dict()))
-    return {**data.dict(), "id": rg_id}
+@router.post("/", response_model=PositionRead, status_code=status.HTTP_201_CREATED)
+async def create_position(position: PositionCreate):
+    # sicherstellen, dass der Raum existiert
+    room_query = rooms.select().where(rooms.c.id == position.room_id)
+    if not await database.fetch_one(room_query):
+        raise HTTPException(status_code=404, detail="Room nicht gefunden")
 
-@router.get("/", response_model=List[RoomGroupRead])
-async def list_room_groups(user=Depends(get_current_user)):
-    return await database.fetch_all(room_groups.select())
+    query = positions.insert().values(**position.dict())
+    pos_id = await database.execute(query)
+    return {**position.dict(), "id": pos_id}
 
-@router.get("/{rg_id}", response_model=RoomGroupRead)
-async def get_roomgroup(rg_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(room_groups.select().where(room_groups.c.id==rg_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="RoomGroup not found")
-    return row
+@router.get("/", response_model=List[PositionRead])
+async def read_positions():
+    query = positions.select()
+    return await database.fetch_all(query)
 
-@router.delete("/{rg_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_roomgroup(rg_id: int, user=Depends(get_current_user)):
-    await database.execute(room_groups.delete().where(room_groups.c.id==rg_id))
-    return
+@router.get("/{id}", response_model=PositionRead)
+async def read_position(id: int):
+    query = positions.select().where(positions.c.id == id)
+    result = await database.fetch_one(query)
+    if not result:
+        raise HTTPException(status_code=404, detail="Position nicht gefunden")
+    return result
+
+@router.put("/{id}", response_model=PositionRead)
+async def update_position(id: int, position: PositionUpdate):
+    # falls room_id geändert wird, prüfen wir die Existenz
+    if position.room_id is not None:
+        room_query = rooms.select().where(rooms.c.id == position.room_id)
+        if not await database.fetch_one(room_query):
+            raise HTTPException(status_code=404, detail="Room nicht gefunden")
+
+    values = {k: v for k, v in position.dict().items() if v is not None}
+    query = (
+        positions.update()
+        .where(positions.c.id == id)
+        .values(**values)
+        .returning(positions)
+    )
+    updated = await database.fetch_one(query)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Position nicht gefunden")
+    return updated
