@@ -37,3 +37,14 @@ class ObjectCreate(ObjectBase):
 
 class ObjectRead(ObjectBase):
     id: int
+
+# --- Bereich-Schemas ---
+class AreaBase(BaseModel):
+    object_id: int
+    name: str
+
+class AreaCreate(AreaBase):
+    pass
+
+class AreaRead(AreaBase):
+    id: int
