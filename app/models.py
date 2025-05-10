@@ -82,7 +82,12 @@ devices = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("system_id", Integer, ForeignKey("systems.id"), nullable=False),
-    Column("position_id", Integer, ForeignKey("positions.id"), nullable=False),
+    Column("object_id", Integer, ForeignKey("objects.id"), nullable=True),
+    Column("area_id", Integer, ForeignKey("areas.id"), nullable=True),
+    Column("roomgroup_id", Integer, ForeignKey("roomgroups.id"), nullable=True),
+    Column("room_id", Integer, ForeignKey("rooms.id"), nullable=True),
+    Column("position_id", Integer, ForeignKey("positions.id"), nullable=True),
     Column("name", String, nullable=False),
     Column("device_type", String, nullable=False),
 )
+
