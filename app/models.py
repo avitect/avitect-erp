@@ -33,3 +33,13 @@ objects = Table(
     Column("name", String, nullable=False),
     Column("description", String, nullable=True),
 )
+
+from sqlalchemy import ForeignKey
+
+areas = Table(
+    "areas",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("object_id", Integer, ForeignKey("objects.id"), nullable=False),
+    Column("name", String, nullable=False),
+)
