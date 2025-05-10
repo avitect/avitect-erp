@@ -5,25 +5,25 @@ from app.models import room_groups
 from app.schemas import RoomGroupCreate, RoomGroupRead
 from app.auth import get_current_user
 
-router = APIRouter(prefix="/roomgroups", tags=["roomgroups"])
+router = APIRouter(prefix="/room_groups", tags=["room_groups"])
 
 @router.post("/", response_model=RoomGroupRead, status_code=status.HTTP_201_CREATED)
 async def create_roomgroup(data: RoomGroupCreate, user=Depends(get_current_user)):
-    rg_id = await database.execute(roomgroups.insert().values(**data.dict()))
+    rg_id = await database.execute(room_groups.insert().values(**data.dict()))
     return {**data.dict(), "id": rg_id}
 
 @router.get("/", response_model=List[RoomGroupRead])
-async def list_roomgroups(user=Depends(get_current_user)):
-    return await database.fetch_all(roomgroups.select())
+async def list_room_groups(user=Depends(get_current_user)):
+    return await database.fetch_all(room_groups.select())
 
 @router.get("/{rg_id}", response_model=RoomGroupRead)
 async def get_roomgroup(rg_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(roomgroups.select().where(roomgroups.c.id==rg_id))
+    row = await database.fetch_one(room_groups.select().where(room_groups.c.id==rg_id))
     if not row:
         raise HTTPException(status_code=404, detail="RoomGroup not found")
     return row
 
 @router.delete("/{rg_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_roomgroup(rg_id: int, user=Depends(get_current_user)):
-    await database.execute(roomgroups.delete().where(roomgroups.c.id==rg_id))
+    await database.execute(room_groups.delete().where(room_groups.c.id==rg_id))
     return
