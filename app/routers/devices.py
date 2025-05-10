@@ -1,29 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, status
 from app.database import database
 from app.models import devices
-from app.schemas import DeviceCreate, DeviceRead
-from app.auth import get_current_user
+from app.schemas import DeviceCreate, DeviceRead, DeviceUpdate
 
-router = APIRouter(prefix="/devices", tags=["devices"])
+router = APIRouter(
+    prefix="/devices",
+    tags=["Devices"],
+)
 
 @router.post("/", response_model=DeviceRead, status_code=status.HTTP_201_CREATED)
-async def create_device(data: DeviceCreate, user=Depends(get_current_user)):
-    dev_id = await database.execute(devices.insert().values(**data.dict()))
-    return {**data.dict(), "id": dev_id}
+async def create_device(device: DeviceCreate):
+    query = devices.insert().values(**device.dict())
+    device_id = await database.execute(query)
+    return {**device.dict(), "id": device_id}
 
 @router.get("/", response_model=List[DeviceRead])
-async def list_devices(user=Depends(get_current_user)):
-    return await database.fetch_all(devices.select())
+async def read_devices():
+    query = devices.select()
+    return await database.fetch_all(query)
 
-@router.get("/{dev_id}", response_model=DeviceRead)
-async def get_device(dev_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(devices.select().where(devices.c.id==dev_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="Device not found")
-    return row
+@router.get("/{id}", response_model=DeviceRead)
+async def read_device(id: int):
+    query = devices.select().where(devices.c.id == id)
+    device = await database.fetch_one(query)
+    if not device:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Device nicht gefunden",
+        )
+    return device
 
-@router.delete("/{dev_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_device(dev_id: int, user=Depends(get_current_user)):
-    await database.execute(devices.delete().where(devices.c.id==dev_id))
-    return
+@router.put("/{id}", response_model=DeviceRead)
+async def update_device(id: int, device: DeviceUpdate):
+    values = {k: v for k, v in device.dict().items() if v is not None}
+    query = (
+        devices.update()
+        .where(devices.c.id == id)
+        .values(**values)
+        .returning(devices)
+    )
+    updated = await database.fetch_one(query)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Device nicht gefunden",
+        )
+    return updated
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_device(id: int):
+    query = devices.delete().where(devices.c.id == id)
+    result = await database.execute(query)
+    if result == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Device nicht gefunden",
+        )
+    return None
