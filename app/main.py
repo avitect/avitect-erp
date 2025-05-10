@@ -4,6 +4,8 @@ from app.auth import router as auth_router, get_current_user
 from app.models import users as users_table
 from app.routers.customers import router as customers_router
 from app.routers.objects   import router as objects_router
+from app.routers.areas import router as areas_router
+
 
 # Tabellen anlegen
 metadata.create_all(bind=engine)
@@ -27,6 +29,8 @@ app.include_router(customers_router)
 
 # Neu: Objekt-Router
 app.include_router(objects_router)
+app.include_router(areas_router)
+
 
 # Geschützter Beispiel-Endpoint
 @app.get("/protected")
