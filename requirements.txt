@@ -3,3 +3,8 @@ djangorestframework
 pytest
 fastapi
 uvicorn[standard]
+sqlalchemy
+databases[postgresql]
+passlib[bcrypt]
+python-jose[cryptography]
+fastapi-users[sqlalchemy2]
