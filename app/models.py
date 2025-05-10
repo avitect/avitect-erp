@@ -1,7 +1,7 @@
-from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy import Float
+from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey
 from app.database import metadata
 
+# Users table
 users = Table(
     "users",
     metadata,
@@ -10,11 +10,8 @@ users = Table(
     Column("hashed_password", String, nullable=False),
     Column("role", String, nullable=False, default="integrator"),
 )
-from sqlalchemy import Table, Column, Integer, String, ForeignKey
-from app.database import metadata
 
-# ... Dein users-Table oben bleibt bestehen ...
-
+# Customers table
 customers = Table(
     "customers",
     metadata,
@@ -24,8 +21,7 @@ customers = Table(
     Column("phone", String, nullable=True),
 )
 
-from sqlalchemy import ForeignKey
-
+# Objects (Immobilien)
 objects = Table(
     "objects",
     metadata,
@@ -35,8 +31,7 @@ objects = Table(
     Column("description", String, nullable=True),
 )
 
-from sqlalchemy import ForeignKey
-
+# Areas (Bereiche)
 areas = Table(
     "areas",
     metadata,
@@ -45,23 +40,25 @@ areas = Table(
     Column("name", String, nullable=False),
 )
 
-roomgroups = Table(
-    "roomgroups",
+# Room Groups (Raumgruppen)
+room_groups = Table(
+    "room_groups",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("area_id", Integer, ForeignKey("areas.id"), nullable=False),
     Column("name", String, nullable=False),
 )
 
-
+# Rooms (Räume)
 rooms = Table(
     "rooms",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("area_id", Integer, ForeignKey("areas.id"), nullable=False),
+    Column("room_group_id", Integer, ForeignKey("room_groups.id"), nullable=False),
     Column("name", String, nullable=False),
 )
 
+# Positions (Positionen)
 positions = Table(
     "positions",
     metadata,
@@ -70,6 +67,7 @@ positions = Table(
     Column("name", String, nullable=False),
 )
 
+# Systems table
 systems = Table(
     "systems",
     metadata,
@@ -78,6 +76,7 @@ systems = Table(
     Column("name", String, nullable=False),
 )
 
+# Devices table
 devices = Table(
     "devices",
     metadata,
@@ -85,33 +84,35 @@ devices = Table(
     Column("system_id", Integer, ForeignKey("systems.id"), nullable=False),
     Column("object_id", Integer, ForeignKey("objects.id"), nullable=True),
     Column("area_id", Integer, ForeignKey("areas.id"), nullable=True),
-    Column("roomgroup_id", Integer, ForeignKey("roomgroups.id"), nullable=True),
+    Column("room_group_id", Integer, ForeignKey("room_groups.id"), nullable=True),
     Column("room_id", Integer, ForeignKey("rooms.id"), nullable=True),
     Column("position_id", Integer, ForeignKey("positions.id"), nullable=True),
     Column("name", String, nullable=False),
     Column("device_type", String, nullable=False),
 )
 
+# Ports table
 ports = Table(
     "ports",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("device_id", Integer, ForeignKey("devices.id"), nullable=False),
     Column("name", String, nullable=False),
-    Column("direction", String, nullable=False),      # input/output
-    Column("connectivity", String, nullable=False),   # wired/wireless
-    Column("connector_type", String, nullable=True),  # Stecker-Typ
-    Column("signal_type", String, nullable=True),     # Signal-Art
+    Column("direction", String, nullable=False),
+    Column("connectivity", String, nullable=False),
+    Column("connector_type", String, nullable=True),
+    Column("signal_type", String, nullable=True),
 )
 
+# Connections table
 connections = Table(
     "connections",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("from_device_id", Integer, ForeignKey("devices.id"), nullable=False),
-    Column("from_port_id",   Integer, ForeignKey("ports.id"),   nullable=False),
-    Column("to_device_id",   Integer, ForeignKey("devices.id"), nullable=False),
-    Column("to_port_id",     Integer, ForeignKey("ports.id"),   nullable=False),
-    Column("cable_type",     String,  nullable=True),
-    Column("cable_length",   Float,   nullable=True),
+    Column("from_port_id", Integer, ForeignKey("ports.id"), nullable=False),
+    Column("to_device_id", Integer, ForeignKey("devices.id"), nullable=False),
+    Column("to_port_id", Integer, ForeignKey("ports.id"), nullable=False),
+    Column("cable_type", String, nullable=True),
+    Column("cable_length", Float, nullable=True),
 )
