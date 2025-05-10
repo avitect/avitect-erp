@@ -92,3 +92,16 @@ class SystemCreate(SystemBase):
 
 class SystemRead(SystemBase):
     id: int
+
+# --- Device-Schemas ---
+class DeviceBase(BaseModel):
+    system_id: int
+    position_id: int
+    name: str
+    device_type: str  # freier Text, z.B. "Sonos Amp"
+
+class DeviceCreate(DeviceBase):
+    pass
+
+class DeviceRead(DeviceBase):
+    id: int
