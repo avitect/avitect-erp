@@ -81,3 +81,14 @@ class PositionCreate(PositionBase):
 
 class PositionRead(PositionBase):
     id: int
+
+# --- System-Schemas ---
+class SystemBase(BaseModel):
+    object_id: int
+    name: str
+
+class SystemCreate(SystemBase):
+    pass
+
+class SystemRead(SystemBase):
+    id: int
