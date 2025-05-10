@@ -95,7 +95,6 @@ class SystemRead(SystemBase):
 
 # --- Device-Schemas ---
 class DeviceBase(BaseModel):
-    class DeviceBase(BaseModel):
     system_id: int
     name: str
     device_type: str
