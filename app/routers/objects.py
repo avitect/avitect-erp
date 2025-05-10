@@ -4,6 +4,8 @@ from app.database import database
 from app.models import objects
 from app.schemas import ObjectCreate, ObjectRead
 from app.auth import get_current_user
+from fastapi import HTTPException, status
+from app.schemas import ObjectUpdate, ObjectRead
 
 router = APIRouter(prefix="/objects", tags=["objects"])
 
@@ -11,6 +13,25 @@ router = APIRouter(prefix="/objects", tags=["objects"])
 async def create_object(data: ObjectCreate, user=Depends(get_current_user)):
     obj_id = await database.execute(objects.insert().values(**data.dict()))
     return {**data.dict(), "id": obj_id}
+
+@router.put("/{id}", response_model=ObjectRead)
+def update_object(id: int, data: ObjectUpdate):
+    # Wir entfernen alle Felder, die der Nutzer nicht mitgeschickt hat (None)
+    values = {k: v for k, v in data.dict().items() if v is not None}
+
+    stmt = (
+        objects.update()
+        .where(objects.c.id == id)
+        .values(**values)
+        .returning(objects)    # liefert uns die geänderten Zeilen zurück
+    )
+    updated = database.fetch_one(stmt)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Object nicht gefunden"
+        )
+    return updated
 
 @router.get("/", response_model=List[ObjectRead])
 async def list_objects(user=Depends(get_current_user)):
