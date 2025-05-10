@@ -2,6 +2,8 @@ from fastapi import FastAPI, Depends
 from app.database import database, engine, metadata
 from app.auth import router as auth_router, get_current_user
 from app.models import users as users_table
+from app.routers.customers import router as customers_router
+from app.routers.objects   import router as objects_router
 
 # Tabellen anlegen
 metadata.create_all(bind=engine)
@@ -22,6 +24,9 @@ from app.routers.customers import router as customers_router
 
 # ganz unten:
 app.include_router(customers_router)
+
+# Neu: Objekt-Router
+app.include_router(objects_router)
 
 # Geschützter Beispiel-Endpoint
 @app.get("/protected")
