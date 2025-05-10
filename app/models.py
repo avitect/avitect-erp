@@ -68,3 +68,11 @@ positions = Table(
     Column("room_id", Integer, ForeignKey("rooms.id"), nullable=False),
     Column("name", String, nullable=False),
 )
+
+systems = Table(
+    "systems",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("object_id", Integer, ForeignKey("objects.id"), nullable=False),
+    Column("name", String, nullable=False),
+)
