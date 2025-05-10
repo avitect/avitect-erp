@@ -1,29 +1,56 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
+from fastapi import APIRouter, HTTPException, status, Depends
 from app.database import database
-from app.models import positions
-from app.schemas import PositionCreate, PositionRead
+from app.models import positions, rooms
+from app.schemas import PositionCreate, PositionRead, PositionUpdate
 from app.auth import get_current_user
 
-router = APIRouter(prefix="/positions", tags=["positions"])
+router = APIRouter(
+    prefix="/positions",
+    tags=["Positions"],
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.post("/", response_model=PositionRead, status_code=status.HTTP_201_CREATED)
-async def create_position(data: PositionCreate, user=Depends(get_current_user)):
-    pos_id = await database.execute(positions.insert().values(**data.dict()))
-    return {**data.dict(), "id": pos_id}
+async def create_position(position: PositionCreate):
+    # sicherstellen, dass der Raum existiert
+    room_query = rooms.select().where(rooms.c.id == position.room_id)
+    if not await database.fetch_one(room_query):
+        raise HTTPException(status_code=404, detail="Room nicht gefunden")
+
+    query = positions.insert().values(**position.dict())
+    pos_id = await database.execute(query)
+    return {**position.dict(), "id": pos_id}
 
 @router.get("/", response_model=List[PositionRead])
-async def list_positions(user=Depends(get_current_user)):
-    return await database.fetch_all(positions.select())
+async def read_positions():
+    query = positions.select()
+    return await database.fetch_all(query)
 
-@router.get("/{pos_id}", response_model=PositionRead)
-async def get_position(pos_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(positions.select().where(positions.c.id==pos_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="Position not found")
-    return row
+@router.get("/{id}", response_model=PositionRead)
+async def read_position(id: int):
+    query = positions.select().where(positions.c.id == id)
+    result = await database.fetch_one(query)
+    if not result:
+        raise HTTPException(status_code=404, detail="Position nicht gefunden")
+    return result
 
-@router.delete("/{pos_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_position(pos_id: int, user=Depends(get_current_user)):
-    await database.execute(positions.delete().where(positions.c.id==pos_id))
-    return
+@router.put("/{id}", response_model=PositionRead)
+async def update_position(id: int, position: PositionUpdate):
+    # falls room_id geändert wird, prüfen wir die Existenz
+    if position.room_id is not None:
+        room_query = rooms.select().where(rooms.c.id == position.room_id)
+        if not await database.fetch_one(room_query):
+            raise HTTPException(status_code=404, detail="Room nicht gefunden")
+
+    values = {k: v for k, v in position.dict().items() if v is not None}
+    query = (
+        positions.update()
+        .where(positions.c.id == id)
+        .values(**values)
+        .returning(positions)
+    )
+    updated = await database.fetch_one(query)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Position nicht gefunden")
+    return updated
