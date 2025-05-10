@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.database import database
-from app.models import roomgroups
+from app.models import room_groups
 from app.schemas import RoomGroupCreate, RoomGroupRead
 from app.auth import get_current_user
 
