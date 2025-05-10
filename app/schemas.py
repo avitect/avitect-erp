@@ -23,3 +23,17 @@ class CustomerCreate(CustomerBase):
 
 class CustomerRead(CustomerBase):
     id: int
+
+from typing import Optional
+
+# --- Object-Schemas ---
+class ObjectBase(BaseModel):
+    customer_id: int
+    name: str
+    description: Optional[str] = None
+
+class ObjectCreate(ObjectBase):
+    pass
+
+class ObjectRead(ObjectBase):
+    id: int
