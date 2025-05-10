@@ -1,50 +1,62 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
+from fastapi import APIRouter, HTTPException, status
 from app.database import database
 from app.models import areas
-from app.schemas import AreaCreate, AreaRead
-from app.auth import get_current_user
-from fastapi import HTTPException, status
-from app.schemas import AreaUpdate, AreaRead
+from app.schemas import AreaCreate, AreaRead, AreaUpdate
 
-
-router = APIRouter(prefix="/areas", tags=["areas"])
+router = APIRouter(
+    prefix="/areas",
+    tags=["Areas"],
+)
 
 @router.post("/", response_model=AreaRead, status_code=status.HTTP_201_CREATED)
-async def create_area(data: AreaCreate, user=Depends(get_current_user)):
-    area_id = await database.execute(areas.insert().values(**data.dict()))
-    return {**data.dict(), "id": area_id}
+async def create_area(area: AreaCreate):
+    query = areas.insert().values(**area.dict())
+    area_id = await database.execute(query)
+    return {**area.dict(), "id": area_id}
+
+@router.get("/", response_model=List[AreaRead])
+async def read_areas():
+    query = areas.select()
+    return await database.fetch_all(query)
+
+@router.get("/{id}", response_model=AreaRead)
+async def read_area(id: int):
+    query = areas.select().where(areas.c.id == id)
+    area = await database.fetch_one(query)
+    if not area:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Area nicht gefunden",
+        )
+    return area
 
 @router.put("/{id}", response_model=AreaRead)
-def update_area(id: int, data: AreaUpdate):
-    values = {k: v for k, v in data.dict().items() if v is not None}
-    stmt = (
+async def update_area(id: int, area: AreaUpdate):
+    # Nur die Felder aktualisieren, die nicht None sind
+    values = {k: v for k, v in area.dict().items() if v is not None}
+    query = (
         areas.update()
         .where(areas.c.id == id)
         .values(**values)
         .returning(areas)
     )
-    updated = database.fetch_one(stmt)
+    updated = await database.fetch_one(query)
     if not updated:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Area nicht gefunden"
+            detail="Area nicht gefunden",
         )
     return updated
 
-
-@router.get("/", response_model=List[AreaRead])
-async def list_areas(user=Depends(get_current_user)):
-    return await database.fetch_all(areas.select())
-
-@router.get("/{area_id}", response_model=AreaRead)
-async def get_area(area_id: int, user=Depends(get_current_user)):
-    row = await database.fetch_one(areas.select().where(areas.c.id==area_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="Area not found")
-    return row
-
-@router.delete("/{area_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_area(area_id: int, user=Depends(get_current_user)):
-    await database.execute(areas.delete().where(areas.c.id==area_id))
-    return
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_area(id: int):
+    query = areas.delete().where(areas.c.id == id)
+    result = await database.execute(query)
+    if result == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Area nicht gefunden",
+        )
+    # FastAPI kümmert sich um den 204-Response
+    return None
