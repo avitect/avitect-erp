@@ -5,6 +5,7 @@ from app.models import users as users_table
 from app.routers.customers import router as customers_router
 from app.routers.objects   import router as objects_router
 from app.routers.areas import router as areas_router
+from app.routers.roomgroups import router as roomgroups_router
 from app.routers.rooms import router as rooms_router
 
 
@@ -29,6 +30,7 @@ from app.routers.customers import router as customers_router
 app.include_router(customers_router)
 app.include_router(objects_router)
 app.include_router(areas_router)
+app.include_router(roomgroups_router)
 app.include_router(rooms_router)
 
 
