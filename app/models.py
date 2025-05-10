@@ -102,3 +102,15 @@ ports = Table(
     Column("connector_type", String, nullable=True),  # Stecker-Typ
     Column("signal_type", String, nullable=True),     # Signal-Art
 )
+
+connections = Table(
+    "connections",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("from_device_id", Integer, ForeignKey("devices.id"), nullable=False),
+    Column("from_port_id",   Integer, ForeignKey("ports.id"),   nullable=False),
+    Column("to_device_id",   Integer, ForeignKey("devices.id"), nullable=False),
+    Column("to_port_id",     Integer, ForeignKey("ports.id"),   nullable=False),
+    Column("cable_type",     String,  nullable=True),
+    Column("cable_length",   Float,   nullable=True),
+)
