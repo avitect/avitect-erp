@@ -9,3 +9,16 @@ users = Table(
     Column("hashed_password", String, nullable=False),
     Column("role", String, nullable=False, default="integrator"),
 )
+from sqlalchemy import Table, Column, Integer, String, ForeignKey
+from app.database import metadata
+
+# ... Dein users-Table oben bleibt bestehen ...
+
+customers = Table(
+    "customers",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String, nullable=False),
+    Column("email", String, nullable=True),
+    Column("phone", String, nullable=True),
+)
