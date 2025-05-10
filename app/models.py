@@ -44,6 +44,15 @@ areas = Table(
     Column("name", String, nullable=False),
 )
 
+roomgroups = Table(
+    "roomgroups",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("area_id", Integer, ForeignKey("areas.id"), nullable=False),
+    Column("name", String, nullable=False),
+)
+
+
 rooms = Table(
     "rooms",
     metadata,
