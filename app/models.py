@@ -43,3 +43,11 @@ areas = Table(
     Column("object_id", Integer, ForeignKey("objects.id"), nullable=False),
     Column("name", String, nullable=False),
 )
+
+rooms = Table(
+    "rooms",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("area_id", Integer, ForeignKey("areas.id"), nullable=False),
+    Column("name", String, nullable=False),
+)
