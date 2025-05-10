@@ -1,11 +1,7 @@
-django>=4.2
-djangorestframework
-pytest
-fastapi
-uvicorn[standard]
-sqlalchemy
-databases[postgresql]
 passlib[bcrypt]
 python-jose[cryptography]
-fastapi-users[sqlalchemy2]
+databases[postgresql]
+sqlalchemy
 psycopg2-binary
+fastapi
+uvicorn[standard]
