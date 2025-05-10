@@ -91,3 +91,14 @@ devices = Table(
     Column("device_type", String, nullable=False),
 )
 
+ports = Table(
+    "ports",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("device_id", Integer, ForeignKey("devices.id"), nullable=False),
+    Column("name", String, nullable=False),
+    Column("direction", String, nullable=False),      # input/output
+    Column("connectivity", String, nullable=False),   # wired/wireless
+    Column("connector_type", String, nullable=True),  # Stecker-Typ
+    Column("signal_type", String, nullable=True),     # Signal-Art
+)
