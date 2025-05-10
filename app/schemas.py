@@ -109,3 +109,36 @@ class DeviceCreate(DeviceBase):
 
 class DeviceRead(DeviceBase):
     id: int
+
+from typing import Literal
+
+# --- Port-Schemas ---
+class PortBase(BaseModel):
+    device_id: int
+    name: str
+    direction: Literal["input", "output"]
+    connectivity: Literal["wired", "wireless"]
+    connector_type: Optional[str] = None
+    signal_type: Optional[str] = None
+
+class PortCreate(PortBase):
+    pass
+
+class PortRead(PortBase):
+    id: int
+
+# --- Connection-Schemas ---
+class ConnectionBase(BaseModel):
+    from_device_id: int
+    from_port_id: int
+    to_device_id: int
+    to_port_id: int
+    cable_type: Optional[str] = None
+    cable_length: Optional[float] = None
+
+class ConnectionCreate(ConnectionBase):
+    pass
+
+class ConnectionRead(ConnectionBase):
+    id: int
+
