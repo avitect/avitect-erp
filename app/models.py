@@ -76,3 +76,13 @@ systems = Table(
     Column("object_id", Integer, ForeignKey("objects.id"), nullable=False),
     Column("name", String, nullable=False),
 )
+
+devices = Table(
+    "devices",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("system_id", Integer, ForeignKey("systems.id"), nullable=False),
+    Column("position_id", Integer, ForeignKey("positions.id"), nullable=False),
+    Column("name", String, nullable=False),
+    Column("device_type", String, nullable=False),
+)
