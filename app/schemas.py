@@ -95,10 +95,15 @@ class SystemRead(SystemBase):
 
 # --- Device-Schemas ---
 class DeviceBase(BaseModel):
+    class DeviceBase(BaseModel):
     system_id: int
-    position_id: int
     name: str
-    device_type: str  # freier Text, z.B. "Sonos Amp"
+    device_type: str
+    object_id: Optional[int] = None
+    area_id: Optional[int] = None
+    roomgroup_id: Optional[int] = None
+    room_id: Optional[int] = None
+    position_id: Optional[int] = None
 
 class DeviceCreate(DeviceBase):
     pass
