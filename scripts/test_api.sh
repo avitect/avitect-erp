@@ -7,7 +7,7 @@ PASSWORD="DeinPasswort123"
 
 echo "🔑 Hole JWT-Token…"
 TOKEN=$(
-  curl -sSL -L -X POST "$BASE/auth/login" \
+  curl -sSL -X POST "$BASE/auth/login" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "username=$EMAIL&password=$PASSWORD" \
   | jq -r .access_token
@@ -48,7 +48,7 @@ curl -sSL -L -X POST "$BASE/connections/" \
 | jq .
 
 echo -e "\n5) Alle Daten listen…"
-echo " Systems:";     curl -sSL -L "$BASE/systems/"     -H "Authorization: Bearer $TOKEN" | jq .
-echo " Devices:";     curl -sSL -L "$BASE/devices/"     -H "Authorization: Bearer $TOKEN" | jq .
-echo " Ports:";       curl -sSL -L "$BASE/ports/"       -H "Authorization: Bearer $TOKEN" | jq .
-echo " Connections:"; curl -sSL -L "$BASE/connections/" -H "Authorization: Bearer $TOKEN" | jq .
+echo " Systems:";     curl -sSL -L "$BASE/systems/"      -H "Authorization: Bearer $TOKEN" | jq .
+echo " Devices:";     curl -sSL -L "$BASE/devices/"      -H "Authorization: Bearer $TOKEN" | jq .
+echo " Ports:";       curl -sSL -L "$BASE/ports/"        -H "Authorization: Bearer $TOKEN" | jq .
+echo " Connections:"; curl -sSL -L "$BASE/connections/"  -H "Authorization: Bearer $TOKEN" | jq .
