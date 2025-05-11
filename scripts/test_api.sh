@@ -10,7 +10,7 @@ TOKEN=$(
   curl -sSL -X POST "$BASE/auth/login" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "username=$EMAIL&password=$PASSWORD" \
-  | jq -r .access_token
+    | jq -r .access_token
 )
 echo "✅ Token erhalten: $TOKEN"
 
