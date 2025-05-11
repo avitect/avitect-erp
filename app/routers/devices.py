@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, status
+
 from app.database import database
 from app.models import devices
 from app.schemas import DeviceCreate, DeviceRead, DeviceUpdate
