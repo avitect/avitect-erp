@@ -64,10 +64,20 @@ CONN_JSON=$(
 )
 echo "$CONN_JSON" | jq .
 CONN_ID=$(echo "$CONN_JSON" | jq -r .id)
-echo "→ connection_id = $CONN_ID"
 
-echo -e "\n5) Listing everything…"
-echo " Systems:";     curl -sSL "$BASE/systems/"     -H "Authorization: Bearer $TOKEN" | jq .
-echo " Devices:";     curl -sSL "$BASE/devices/"     -H "Authorization: Bearer $TOKEN" | jq .
-echo " Ports:";       curl -sSL "$BASE/ports/"       -H "Authorization: Bearer $TOKEN" | jq .
-echo " Connections:"; curl -sSL "$BASE/connections/" -H "Authorization: Bearer $TOKEN" | jq .
+echo -e "\n5) Listing all data…"
+curl -sSL -X GET "$BASE/systems/" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
+
+curl -sSL -X GET "$BASE/devices/" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
+
+curl -sSL -X GET "$BASE/ports/" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
+
+curl -sSL -X GET "$BASE/connections/" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq .
