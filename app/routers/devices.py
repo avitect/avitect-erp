@@ -1,61 +1,24 @@
-from typing import List, Optional
-from fastapi import APIRouter, HTTPException, status
+# app/routers/devices.py
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.schemas import DeviceCreate, Device
+from app.models import devices as devices_table, Device as DeviceModel
 
-from app.database import database
-from app.models import devices
-from app.schemas import DeviceCreate, DeviceRead, DeviceUpdate
+router = APIRouter()
 
-router = APIRouter(
-    prefix="/devices",
-    tags=["Devices"],
-)
-
-@router.post("/", response_model=DeviceRead, status_code=status.HTTP_201_CREATED)
-async def create_device(device: DeviceCreate):
-    query = devices.insert().values(**device.dict())
-    device_id = await database.execute(query)
-    return {**device.dict(), "id": device_id}
-
-@router.get("/", response_model=List[DeviceRead])
-async def read_devices():
-    query = devices.select()
-    return await database.fetch_all(query)
-
-@router.get("/{id}", response_model=DeviceRead)
-async def read_device(id: int):
-    query = devices.select().where(devices.c.id == id)
-    device = await database.fetch_one(query)
-    if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device nicht gefunden",
-        )
-    return device
-
-@router.put("/{id}", response_model=DeviceRead)
-async def update_device(id: int, device: DeviceUpdate):
-    values = {k: v for k, v in device.dict().items() if v is not None}
-    query = (
-        devices.update()
-        .where(devices.c.id == id)
-        .values(**values)
-        .returning(devices)
-    )
-    updated = await database.fetch_one(query)
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device nicht gefunden",
-        )
-    return updated
-
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_device(id: int):
-    query = devices.delete().where(devices.c.id == id)
-    result = await database.execute(query)
-    if result == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device nicht gefunden",
-        )
-    return None
+@router.post("/devices/", response_model=Device)
+def create_device(device: DeviceCreate, db: Session = Depends(get_db)):
+    # Nur gültige Felder übergeben (None und roomgroup_id rausfiltern)
+    data = device.dict(exclude_none=True, exclude={"roomgroup_id"})
+    try:
+        result = db.execute(devices_table.insert().values(**data))
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Datenbank-Fehler: {e}")
+    new_id = result.inserted_primary_key[0]
+    new_device = db.query(DeviceModel).get(new_id)
+    if not new_device:
+        raise HTTPException(status_code=404, detail="Device wurde nicht gefunden")
+    return new_device
